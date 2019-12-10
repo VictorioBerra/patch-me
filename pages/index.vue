@@ -53,6 +53,9 @@
 </template>
 
 <script>
+
+import uuidv4 from 'uuid/v4';
+
 import PatchBayCard from "~/components/PatchBayCard.vue";
 
 export default {
@@ -62,7 +65,7 @@ export default {
   data() {
     return {
       PatchBaseUrl: 'https://patchbay.pub/',
-      PatchBayLink: '',
+      PatchBayLink: uuidv4(),
       pubSub: true,
       notification: true,
       timeout: 60000,
@@ -79,6 +82,7 @@ export default {
         pubSub: this.pubSub,
         timeout: this.timeout,
       })
+      this.PatchBayLink = uuidv4()
     }
   }
 }
