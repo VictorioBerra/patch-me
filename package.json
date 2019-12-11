@@ -1,7 +1,7 @@
 {
-  "name": "PatchBayUI",
+  "name": "patch-me",
   "version": "1.0.0",
-  "description": "My superb Nuxt.js project",
+  "description": "A GUI for services like https://patchbay.pub/",
   "author": "Victorio Berra",
   "private": true,
   "scripts": {
