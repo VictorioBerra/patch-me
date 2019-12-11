@@ -16,7 +16,6 @@ jobs:
     - name: Generate
       run: npm run generate
     - uses: jakejarvis/s3-sync-action@master
-    - name: Deploy
       with:
         args: --acl public-read --follow-symlinks --delete
       env:
