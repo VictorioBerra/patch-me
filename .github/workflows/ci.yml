@@ -1,0 +1,19 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install deps
+      run: npm i
+    - name: Build
+      run: npm run build
+    - name: Generate
+      run: npm run generate
+ #   - name: S3 Sync
+ #     uses: jakejarvis/s3-sync-action@v0.5.0
