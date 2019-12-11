@@ -10,20 +10,22 @@
     </v-text-field>
 
     <v-card-subtitle>
-      <span v-if="patchBaySub.pubSub">✔ PubSub | </span>
-      <span>Tmeout MS: {{ patchBaySub.timeout }}</span>
+      <span v-if="patchSub.pubSub">✔ PubSub | </span>
+      <span>Tmeout MS: {{ patchSub.timeout }}</span>
     </v-card-subtitle>
 
     <v-card-text>
       <p v-if="completed">
-        {{ responseAsText }}
+        <strong>{{ responseAsText }}</strong>
       </p>
 
       <p v-if="cancelledOn" class="red--text">
-        Cancel clicked on {{ cancelledOn }}
+        Cancel clicked on {{ cancelledOn | moment("MM/DD h:m:s") }}
       </p>
 
-      <p v-if="timedoutOn" class="red--text">Timedout on {{ timedoutOn }}</p>
+      <p v-if="timedoutOn" class="red--text">
+        Timedout on {{ timedoutOn | moment("MM/DD h:m:s") }}
+      </p>
 
       <div v-if="!completed">
         <div>Example invoke:</div>
@@ -46,7 +48,7 @@
 <script>
 export default {
   props: {
-    patchBaySub: {
+    patchSub: {
       type: Object,
       required: true // TODO: Maybe make a default function that can auto-generate all the props in here? Also, https://vuejs.org/v2/guide/components-props.html#Type-Checks
     }
@@ -66,7 +68,7 @@ export default {
     }
   },
   created: async function() {
-    if (this.patchBaySub.linkCode.length == 0) {
+    if (this.patchSub.linkCode.length == 0) {
       throw Error('link is a required parameter!')
     }
 
@@ -76,11 +78,12 @@ export default {
     this.abortTimeout = setTimeout(() => {
       this.controller.abort()
       this.timedoutOn = new Date() // TODO how to moment?
-    }, this.patchBaySub.timeout)
+    }, this.patchSub.timeout)
 
-    this.fullUrl = this.patchBaySub.patchBaseUrl + this.patchBaySub.linkCode
+    this.fullUrl = this.patchSub.patchBaseUrl + this.patchSub.linkCode
 
-    if (this.patchBaySub.pubSub) {
+    // TODO: Use a URL builder instead of this, fine for MVP.
+    if (this.patchSub.pubSub) {
       this.fullUrl += '?pubsub=true'
     }
 
@@ -90,6 +93,11 @@ export default {
 
       this.responseAsText = responseAsText
       this.completed = true
+
+      if(this.patchSub.notification) {
+        this.$localNotificationAPI(responseAsText);
+      }
+
     } catch (err) {
       if (err.name === 'AbortError') {
         this.completed = true

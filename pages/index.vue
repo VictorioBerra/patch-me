@@ -11,8 +11,8 @@
     <v-row>
       <v-col cols="11">
         <v-text-field
-          v-model="PatchBayLink"
-          label="Patch Bay Link"
+          v-model="PatchLink"
+          label="Patch Link"
         ></v-text-field>
       </v-col>
       <v-col cols="1">
@@ -20,7 +20,7 @@
           dark
           large
           @click="add"
-          :disabled="PatchBayLink.length <= 6"
+          :disabled="PatchLink.length <= 6"
           class="primary"
         >
           Add
@@ -40,13 +40,18 @@
       </v-col>
     </v-row>
     <v-row>
+      <v-col>
+        <v-divider></v-divider>
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col
-        v-for="patchBaySub in PatchPaySubscriptions"
-        :key="patchBaySub.id"
+        v-for="patchSub in PatchSubscriptions"
+        :key="patchSub.id"
         cols="6"
         md="4"
       >
-        <PatchBayCard :patchBaySub="patchBaySub"></PatchBayCard>
+        <PatchCard :patchSub="patchSub"></PatchCard>
       </v-col>
     </v-row>
   </v-container>
@@ -56,33 +61,34 @@
 
 import uuidv4 from 'uuid/v4';
 
-import PatchBayCard from "~/components/PatchBayCard.vue";
+import PatchCard from "~/components/PatchCard.vue";
 
 export default {
  components: {
-    PatchBayCard
+    PatchCard
   },  
   data() {
     return {
       PatchBaseUrl: 'https://patchbay.pub/',
-      PatchBayLink: uuidv4(),
+      PatchLink: uuidv4(),
       pubSub: true,
       notification: true,
       timeout: 60000,
-      PatchPaySubscriptions: []
+      PatchSubscriptions: []
     }
   },
   computed: {},
   methods: {
     add() {
-      this.PatchPaySubscriptions.push({
-        id: this.PatchPaySubscriptions.length + 1,
+      this.PatchSubscriptions.push({
+        id: this.PatchSubscriptions.length + 1,
         patchBaseUrl: this.PatchBaseUrl,
-        linkCode: this.PatchBayLink,
+        linkCode: this.PatchLink,
+        notification: this.notification,
         pubSub: this.pubSub,
         timeout: this.timeout,
       })
-      this.PatchBayLink = uuidv4()
+      this.PatchLink = uuidv4()
     }
   }
 }
