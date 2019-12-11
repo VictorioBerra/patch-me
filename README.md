@@ -1,6 +1,6 @@
-# PatchBayUI
+# PatchMe
 
-> My superb Nuxt.js project
+> GUI for services like https://patchbay.pub/
 
 ## Build Setup
 
