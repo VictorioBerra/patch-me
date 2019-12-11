@@ -1,36 +1,46 @@
 <template>
   <v-card max-width="344">
+    <!-- We use the text field for loading bar because when a card is in the loading state nothing is clickable -->
     <v-text-field
       color="primary"
-      :loading="!completed && !aborted"
+      loading
       disabled
       loader-height="3"
       height="1"
+      v-if="!completedState"
     >
     </v-text-field>
 
-    <v-card-subtitle>
-      <span v-if="patchSub.pubSub">✔ PubSub | </span>
-      <span>Tmeout MS: {{ patchSub.timeout }}</span>
-    </v-card-subtitle>
+    <v-list-item one-line v-if="completedState">
+      <v-list-item-content>
+        <v-list-item-title
+          class="overline success--text"
+          v-if="completedState === 'success'"
+        >
+          COMPLETED {{ completedOn | moment('MM/DD h:m:s') }}
+        </v-list-item-title>
+        <v-list-item-title
+          class="overline secondary--text"
+          v-if="completedState === 'aborted'"
+        >
+          CANCELLED {{ completedOn | moment('MM/DD h:m:s') }}
+        </v-list-item-title>
+        <v-list-item-title
+          class="overline secondary--text"
+          v-if="completedState === 'timedout'"
+        >
+          TIMEOUT {{ completedOn | moment('MM/DD h:m:s') }}
+        </v-list-item-title>
+      </v-list-item-content>
+    </v-list-item>
 
-    <v-card-text>
-      <p v-if="completed">
-        <strong>{{ responseAsText }}</strong>
-      </p>
+    <v-card-text v-if="responseAsText">
+      <p>{{ responseAsText }}</p>
+    </v-card-text>
 
-      <p v-if="cancelledOn" class="red--text">
-        Cancel clicked on {{ cancelledOn | moment("MM/DD h:m:s") }}
-      </p>
-
-      <p v-if="timedoutOn" class="red--text">
-        Timedout on {{ timedoutOn | moment("MM/DD h:m:s") }}
-      </p>
-
-      <div v-if="!completed">
-        <div>Example invoke:</div>
-        <div class="text--primary">curl {{ fullUrl }} -d "Hello World"</div>
-      </div>
+    <v-card-text v-if="!completedState">
+      <strong>Publish with CURL:</strong>
+      <p class="text--primary">curl {{ fullUrl }} -d "Hello World"</p>
     </v-card-text>
 
     <v-card-actions>
@@ -38,9 +48,13 @@
         @click="cancel"
         text
         color="error"
-        :class="{ 'd-none': completed || aborted }"
+        :class="{ 'd-none': completedOn }"
         >Cancel</v-btn
       >
+      <v-spacer></v-spacer>
+      <v-btn text disabled>
+        <span v-if="patchSub.pubSub">✔ PubSub | {{ patchSub.timeout }}</span>
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -57,14 +71,48 @@ export default {
     return {
       responseAsText: null,
       fullUrl: null,
-      completed: false,
-      aborted: false,
 
-      cancelledOn: null,
-      timedoutOn: null,
+      completedOn: false,
+      completedState: null,
 
-      // TODO how to make private??
-      controller: new AbortController()
+      // TODO: How to use private instance variables?
+      abortController: new AbortController()
+    }
+  },
+  computed: {
+    completed: {
+      // getter
+      get: function() {
+        return {
+          completedOn: this.completedOn,
+          completedState: this.completedState
+        }
+      },
+      // setter
+      set: function(state) {
+        this.completedOn = new Date()
+        this.completedState = state
+
+        if (this.patchSub.notification) {
+          if (process.client) {
+            let body = '';
+
+            if (state === 'success') {
+              body += '\n' + this.responseAsText
+            } else {
+              body += this.patchSub.linkCode;
+            }
+
+            this.$notification.show(
+              `Patch Me: ${state}`,
+              {
+                body: body
+              },
+              {}
+            )
+          }
+        }
+      }
     }
   },
   created: async function() {
@@ -72,12 +120,12 @@ export default {
       throw Error('link is a required parameter!')
     }
 
-    const signal = this.controller.signal
+    const signal = this.abortController.signal
 
     // If user cancels, dont trigger this timeout.
     this.abortTimeout = setTimeout(() => {
-      this.controller.abort()
-      this.timedoutOn = new Date() // TODO how to moment?
+      this.abortController.abort()
+      this.completed = 'timedout'
     }, this.patchSub.timeout)
 
     this.fullUrl = this.patchSub.patchBaseUrl + this.patchSub.linkCode
@@ -92,26 +140,19 @@ export default {
       const responseAsText = await response.text()
 
       this.responseAsText = responseAsText
-      this.completed = true
-
-      if(this.patchSub.notification) {
-        this.$localNotificationAPI(responseAsText);
-      }
-
+      this.completed = 'success'
     } catch (err) {
+      console.log(err)
       if (err.name === 'AbortError') {
-        this.completed = true
-        this.aborted = true
+        this.completed = 'aborted'
       }
     }
   },
   methods: {
     cancel() {
       clearTimeout(this.abortTimeout)
-      this.controller.abort()
-      this.completed = true
-      this.aborted = true
-      this.cancelledOn = new Date() // TODO how to moment?
+      this.abortController.abort()
+      this.completed = 'aborted'
     }
   }
 }

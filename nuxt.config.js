@@ -35,8 +35,8 @@ export default {
    */
   plugins: [
     {
-      src: '~/plugins/notifications.js',
-      ssr: false
+      src: '~/plugins/vue-native-notification.js',
+      mode: 'client'
     },
     '~/plugins/vue-moment.js'
   ],

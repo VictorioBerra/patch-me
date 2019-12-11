@@ -14,7 +14,8 @@
     "@nuxtjs/axios": "^5.3.6",
     "nuxt": "^2.0.0",
     "uuid": "^3.3.3",
-    "vue-moment": "^4.0.0"
+    "vue-moment": "^4.0.0",
+    "vue-native-notification": "^1.0.5"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.0.0",
