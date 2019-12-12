@@ -29,6 +29,10 @@ jobs:
 
     - run: npm run generate
 
+    # Fix timestamps (used so the Upload to S3 task doesnt modify unchanged files)
+    - name: restore timestamps
+      uses: chetan/git-restore-mtime-action@release
+
     # Upload to S3
     - name: sync s3
       uses: jakejarvis/s3-sync-action@master
