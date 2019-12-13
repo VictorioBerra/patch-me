@@ -2,7 +2,11 @@
 
 > GUI for services like https://patchbay.pub/
 
-## Build Setup
+Live demo: https://patchme.link/
+
+## Contributing
+
+See [Nuxt.js docs](https://nuxtjs.org).
 
 ``` bash
 # install dependencies
@@ -18,5 +22,3 @@ $ npm run start
 # generate static project
 $ npm run generate
 ```
-
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
