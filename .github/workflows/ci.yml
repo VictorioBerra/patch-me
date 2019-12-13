@@ -9,13 +9,33 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Install deps
-      run: npm i
-    - name: Build
-      run: npm run build
-    - name: Generate
-      run: npm run generate
-    - uses: jakejarvis/s3-sync-action@master
+
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+
+    - name: Cache dependencies
+      uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - run: npm ci
+
+    - run: npm test
+
+    - run: npm run generate
+
+    # Fix timestamps (used so the Upload to S3 task doesnt modify unchanged files)
+    - name: restore timestamps
+      uses: chetan/git-restore-mtime-action@release
+
+    # Upload to S3
+    - name: sync s3
+      uses: jakejarvis/s3-sync-action@master
       with:
         args: --acl public-read --follow-symlinks --delete
       env:
@@ -24,3 +44,13 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: 'us-east-1'
         SOURCE_DIR: 'dist'
+
+    # Invalidate Cloudfront
+    - name: invalidate
+      uses: chetan/invalidate-cloudfront-action@master
+      env:
+        DISTRIBUTION: ${{ secrets.DISTRIBUTION }}
+        PATHS: '/index.html'
+        AWS_REGION: 'us-east-1'
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
