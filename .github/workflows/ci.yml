@@ -10,6 +10,11 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@master
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
