@@ -1,21 +1,28 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12">
+        <v-col
+          cols="12"
+          md="4"
+        >
         <v-text-field
           v-model="PatchBaseUrl"
           label="Patch Base Url"
         ></v-text-field>
       </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="11">
+        <v-col
+          cols="12"
+          md="4"
+        >
         <v-text-field
           v-model="PatchLink"
           label="Patch Link"
         ></v-text-field>
       </v-col>
-      <v-col cols="1">
+        <v-col
+          cols="12"
+          md="4"
+        >
         <v-btn
           dark
           large
@@ -28,11 +35,17 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
+        <v-col
+          cols="12"
+          md="6"
+        >
           <v-switch v-model="pubSub" class="ma-2" label="PubSub"></v-switch>
           <v-switch v-model="notification" class="ma-2" label="Notification"></v-switch>
       </v-col>
-      <v-col>
+        <v-col
+          cols="12"
+          md="6"
+        >
         <v-text-field
           v-model="timeout"
           label="timeout"
