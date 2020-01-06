@@ -1,5 +1,12 @@
 <template>
   <v-container>
+
+    <v-row>
+      <v-col>
+        <p>Use this page to send HTTP requests off to the desired publish URL.</p>
+      </v-col>
+    </v-row>
+
     <v-row>
       <Publisher />
     </v-row>

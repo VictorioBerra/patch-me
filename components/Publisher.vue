@@ -3,16 +3,8 @@
     <v-row>
       <v-col>
         <v-text-field
-          v-model="PatchBaseUrl"
+          v-model="PatchUrl"
           label="Patch Base Url"
-        ></v-text-field>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
-        <v-text-field
-          v-model="PatchLink"
-          label="Patch Link"
         ></v-text-field>
       </v-col>
     </v-row>
@@ -44,8 +36,7 @@
 export default {
   data() {
     return {
-      PatchBaseUrl: 'https://patchbay.pub/',
-      PatchLink: '',
+      PatchUrl: 'https://patchbay.pub/',
       PatchPayload: '',
       pubSub: true
     }
@@ -54,17 +45,13 @@ export default {
   methods: {
     async post() {
 
-      // TODO use URL builder so we dont have to mess with trailing slash
-      let URL = this.PatchBaseUrl + this.PatchLink;
-
-      // TODO: Use a URL builder instead of this, fine for MVP.
       if(this.pubSub) {
-          URL += '?pubsub=true'
+          this.PatchUrl += '?pubsub=true'
       }
 
       try
       {
-        const response = await fetch(URL, {
+        const response = await fetch(this.PatchUrl, {
           method: 'post',
           body: this.PatchPayload
         })
