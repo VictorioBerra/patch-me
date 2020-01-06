@@ -37,14 +37,19 @@
     <v-row>
         <v-col
           cols="12"
-          md="6"
+        md="3"
         >
           <v-switch v-model="pubSub" class="ma-2" label="PubSub"></v-switch>
+      </v-col>
+      <v-col
+        cols="12"
+        md="3"
+      >
           <v-switch v-model="notification" class="ma-2" label="Notification"></v-switch>
       </v-col>
         <v-col
           cols="12"
-          md="6"
+          md="3"
         >
         <v-text-field
           v-model="timeout"
