@@ -142,10 +142,11 @@ export default {
       this.responseAsText = responseAsText
       this.completed = 'success'
     } catch (err) {
-      console.log(err)
       if (err.name === 'AbortError') {
         this.completed = 'aborted'
       }
+    } finally {
+      clearTimeout(this.abortTimeout)
     }
   },
   methods: {
