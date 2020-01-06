@@ -43,7 +43,7 @@
       </v-toolbar>
       <v-list width="100%">
         <template v-for="patchSub in PatchSubscriptions">
-          <PatchCard :patchSub="patchSub" :key="patchSub.id"></PatchCard>
+          <SubscriptionItem :patchSub="patchSub" :key="patchSub.id"></SubscriptionItem>
         </template>
       </v-list>
     </v-row>
@@ -53,11 +53,11 @@
 <script>
 import uuidv4 from 'uuid/v4'
 
-import PatchCard from '~/components/PatchCard.vue'
+import SubscriptionItem from '~/components/SubscriptionItem.vue'
 
 export default {
   components: {
-    PatchCard
+    SubscriptionItem
   },
   data() {
     return {

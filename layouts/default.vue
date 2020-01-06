@@ -89,7 +89,7 @@ export default {
       items: [
         {
           icon: 'mdi-apps',
-          title: 'Patches',
+          title: 'Subscriptions',
           to: '/'
         },
         {

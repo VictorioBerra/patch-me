@@ -1,5 +1,6 @@
 <template v-slot:default>
-  <v-list-item>
+  <v-list-item>    
+
     <v-list-item-icon>
       <v-icon
         @click="cancel"
@@ -12,6 +13,7 @@
     </v-list-item-icon>
 
     <v-list-item-content>
+
       <v-list-item-title>
         <!-- We use the text field for loading bar because when a card is in the loading state nothing is clickable -->
         <v-text-field
@@ -56,8 +58,9 @@
       <v-list-item-subtitle>
         <strong>Timeout: </strong><span>{{ patchSub.timeout }}</span>
       </v-list-item-subtitle>
-
+      
       <v-divider></v-divider>
+
     </v-list-item-content>
   </v-list-item>
 </template>
