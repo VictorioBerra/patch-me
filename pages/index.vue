@@ -1,28 +1,16 @@
 <template>
   <v-container>
     <v-row>
-        <v-col
-          cols="12"
-          md="4"
-        >
+      <v-col cols="12" md="4">
         <v-text-field
           v-model="PatchBaseUrl"
           label="Patch Base Url"
         ></v-text-field>
       </v-col>
-        <v-col
-          cols="12"
-          md="4"
-        >
-        <v-text-field
-          v-model="PatchLink"
-          label="Patch Link"
-        ></v-text-field>
+      <v-col cols="12" md="4">
+        <v-text-field v-model="PatchLink" label="Patch Link"></v-text-field>
       </v-col>
-        <v-col
-          cols="12"
-          md="4"
-        >
+      <v-col cols="12" md="4">
         <v-btn
           dark
           large
@@ -35,56 +23,42 @@
       </v-col>
     </v-row>
     <v-row>
-        <v-col
-          cols="12"
-        md="3"
-        >
-          <v-switch v-model="pubSub" class="ma-2" label="PubSub"></v-switch>
+      <v-col cols="12" md="3">
+        <v-switch v-model="pubSub" class="ma-2" label="PubSub"></v-switch>
       </v-col>
-      <v-col
-        cols="12"
-        md="3"
-      >
-          <v-switch v-model="notification" class="ma-2" label="Notification"></v-switch>
+      <v-col cols="12" md="3">
+        <v-switch
+          v-model="notification"
+          class="ma-2"
+          label="Notification"
+        ></v-switch>
       </v-col>
-        <v-col
-          cols="12"
-          md="3"
-        >
-        <v-text-field
-          v-model="timeout"
-          label="timeout"
-        ></v-text-field>
+      <v-col cols="12" md="3">
+        <v-text-field v-model="timeout" label="timeout"></v-text-field>
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
-        <v-divider></v-divider>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col
-        v-for="patchSub in PatchSubscriptions"
-        :key="patchSub.id"
-        cols="6"
-        md="4"
-      >
-        <PatchCard :patchSub="patchSub"></PatchCard>
-      </v-col>
+      <v-toolbar dark>
+        <v-toolbar-title>Subscriptions</v-toolbar-title>
+      </v-toolbar>
+      <v-list width="100%">
+        <template v-for="patchSub in PatchSubscriptions">
+          <PatchCard :patchSub="patchSub" :key="patchSub.id"></PatchCard>
+        </template>
+      </v-list>
     </v-row>
   </v-container>
 </template>
 
 <script>
+import uuidv4 from 'uuid/v4'
 
-import uuidv4 from 'uuid/v4';
-
-import PatchCard from "~/components/PatchCard.vue";
+import PatchCard from '~/components/PatchCard.vue'
 
 export default {
- components: {
+  components: {
     PatchCard
-  },  
+  },
   data() {
     return {
       PatchBaseUrl: 'https://patchbay.pub/',
@@ -104,7 +78,7 @@ export default {
         linkCode: this.PatchLink,
         notification: this.notification,
         pubSub: this.pubSub,
-        timeout: this.timeout,
+        timeout: this.timeout
       })
       this.PatchLink = uuidv4()
     }

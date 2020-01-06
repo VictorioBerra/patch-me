@@ -1,62 +1,65 @@
-<template>
-  <v-card max-width="344">
-    <!-- We use the text field for loading bar because when a card is in the loading state nothing is clickable -->
-    <v-text-field
-      color="primary"
-      loading
-      disabled
-      loader-height="3"
-      height="1"
-      v-if="!completedState"
-    >
-    </v-text-field>
-
-    <v-list-item one-line v-if="completedState">
-      <v-list-item-content>
-        <v-list-item-title
-          class="overline success--text"
-          v-if="completedState === 'success'"
-        >
-          COMPLETED {{ completedOn | moment('MM/DD h:m:s') }}
-        </v-list-item-title>
-        <v-list-item-title
-          class="overline secondary--text"
-          v-if="completedState === 'aborted'"
-        >
-          CANCELLED {{ completedOn | moment('MM/DD h:m:s') }}
-        </v-list-item-title>
-        <v-list-item-title
-          class="overline secondary--text"
-          v-if="completedState === 'timedout'"
-        >
-          TIMEOUT {{ completedOn | moment('MM/DD h:m:s') }}
-        </v-list-item-title>
-      </v-list-item-content>
-    </v-list-item>
-
-    <v-card-text v-if="responseAsText">
-      <p>{{ responseAsText }}</p>
-    </v-card-text>
-
-    <v-card-text v-if="!completedState">
-      <strong>Publish with CURL:</strong>
-      <p class="text--primary">curl {{ fullUrl }} -d "Hello World"</p>
-    </v-card-text>
-
-    <v-card-actions>
-      <v-btn
+<template v-slot:default>
+  <v-list-item>
+    <v-list-item-icon>
+      <v-icon
         @click="cancel"
         text
         color="error"
-        :class="{ 'd-none': completedOn }"
-        >Cancel</v-btn
+        v-if="!completedOn"
+        title="cancel"
+        >mdi-close-circle-outline</v-icon
       >
-      <v-spacer></v-spacer>
-      <v-btn text disabled>
-        <span v-if="patchSub.pubSub">✔ PubSub | {{ patchSub.timeout }}</span>
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+    </v-list-item-icon>
+
+    <v-list-item-content>
+      <v-list-item-title>
+        <!-- We use the text field for loading bar because when a card is in the loading state nothing is clickable -->
+        <v-text-field
+          color="primary"
+          loading
+          disabled
+          loader-height="3"
+          height="1"
+          v-if="!completedState"
+        >
+        </v-text-field>
+      </v-list-item-title>
+
+      <v-list-item-subtitle class="text--primary" v-if="completedState">
+        <v-list-item-content>
+          <span class="success--text" v-if="completedState === 'success'">
+            COMPLETED {{ completedOn | moment('MM/DD h:m:s') }}
+          </span>
+          <span class="secondary--text" v-if="completedState === 'aborted'">
+            CANCELLED {{ completedOn | moment('MM/DD h:m:s') }}
+          </span>
+          <span class="secondary--text" v-if="completedState === 'timedout'">
+            TIMEOUT {{ completedOn | moment('MM/DD h:m:s') }}
+          </span>
+        </v-list-item-content>
+      </v-list-item-subtitle>
+
+      <v-list-item-subtitle>
+        <div v-if="responseAsText" class="title success--text">
+          <strong>Response: </strong><span>{{ responseAsText }}</span>
+        </div>
+        <div v-if="!completedState">
+          <strong>Publish with CURL:</strong>
+          <p class="text--primary">curl {{ fullUrl }} -d "Hello World"</p>
+        </div>
+      </v-list-item-subtitle>
+
+      <v-list-item-subtitle>
+        <strong>PubSub: </strong><span>{{ patchSub.pubSub }}</span>
+      </v-list-item-subtitle>
+
+      <v-list-item-subtitle>
+        <strong>Timeout: </strong><span>{{ patchSub.timeout }}</span>
+      </v-list-item-subtitle>
+
+      <v-divider></v-divider>
+    </v-list-item-content>
+  </v-list-item>
 </template>
 
 <script>
@@ -95,12 +98,12 @@ export default {
 
         if (this.patchSub.notification) {
           if (process.client) {
-            let body = '';
+            let body = ''
 
             if (state === 'success') {
               body += '\n' + this.responseAsText
             } else {
-              body += this.patchSub.linkCode;
+              body += this.patchSub.linkCode
             }
 
             this.$notification.show(
@@ -125,7 +128,10 @@ export default {
     // If user cancels, dont trigger this timeout.
     this.abortTimeout = setTimeout(() => {
       this.abortController.abort()
-      this.completed = 'timedout'
+      // This is needed to let the abort trigger the below try/catch. Aborting causes the fetch to throw.
+      setTimeout(() => {
+        this.completed = 'timedout'
+      });
     }, this.patchSub.timeout)
 
     this.fullUrl = this.patchSub.patchBaseUrl + this.patchSub.linkCode
@@ -142,6 +148,7 @@ export default {
       this.responseAsText = responseAsText
       this.completed = 'success'
     } catch (err) {
+      console.log(err)
       if (err.name === 'AbortError') {
         this.completed = 'aborted'
       }
