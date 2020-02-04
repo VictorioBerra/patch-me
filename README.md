@@ -22,3 +22,8 @@ $ npm run start
 # generate static project
 $ npm run generate
 ```
+
+# TODO
+
+- Allow removing timeout records
+- Pass last patch link to publisher component
