@@ -42,12 +42,14 @@
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
-        <div v-if="responseAsText" class="title success--text">
-          <strong>Response: </strong><span>{{ responseAsText }}</span>
-        </div>
+          <strong>Url:</strong>
+          <a href="fullUrl">{{ fullUrl }}</a>
+      </v-list-item-subtitle>
+
+      <v-list-item-subtitle>
         <div v-if="!completedState">
           <strong>Publish with CURL:</strong>
-          <p class="text--primary">curl {{ fullUrl }} -d "Hello World"</p>
+          <span class="text--primary">curl {{ fullUrl }} -d "Hello World"</span>
         </div>
       </v-list-item-subtitle>
 
@@ -56,7 +58,14 @@
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
-        <strong>Timeout: </strong><span>{{ patchSub.timeout }}</span>
+        <strong>Timeout: </strong><span>{{ patchSub.timeout > 0 ? patchSub.timeout : "none" }}</span>
+      </v-list-item-subtitle>
+
+      <v-list-item-subtitle>
+        <div v-if="responseAsText">
+          <strong class="title success--text">Response:</strong>
+          <p>{{ responseAsText }}</p>
+        </div>
       </v-list-item-subtitle>
       
       <v-divider></v-divider>
@@ -128,14 +137,16 @@ export default {
 
     const signal = this.abortController.signal
 
-    // If user cancels, dont trigger this timeout.
-    this.abortTimeout = setTimeout(() => {
-      this.abortController.abort()
-      // This is needed to let the abort trigger the below try/catch. Aborting causes the fetch to throw.
-      setTimeout(() => {
-        this.completed = 'timedout'
-      });
-    }, this.patchSub.timeout)
+    if(this.patchSub.timeout > 0) {
+      // If user cancels, dont trigger this timeout.
+      this.abortTimeout = setTimeout(() => {
+        this.abortController.abort()
+          // This is needed to let the abort trigger the below try/catch. Aborting causes the fetch to throw.
+          setTimeout(() => {
+            this.completed = 'timedout'
+          });
+      }, this.patchSub.timeout)
+    }
 
     this.fullUrl = this.patchSub.patchBaseUrl + this.patchSub.linkCode
 

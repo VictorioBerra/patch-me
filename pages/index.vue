@@ -10,13 +10,28 @@
       <v-col cols="12" md="4">
         <v-text-field v-model="PatchLink" label="Patch Link"></v-text-field>
       </v-col>
-      <v-col cols="12" md="4">
+      <v-col cols="12" md="2">
         <v-btn
           dark
           large
+          @click="generate"
+          class="primary"
+          title="Generate Random"
+        >
+      <v-icon
+        title="generate random"
+        >mdi-refresh</v-icon
+      >
+        </v-btn>
+      </v-col>
+      <v-col cols="12" md="2">
+        <v-btn
+          dark
+          large
+          block
           @click="add"
           :disabled="PatchLink.length <= 6"
-          class="primary"
+          class="deep-purple accent-4"
         >
           Add
         </v-btn>
@@ -34,7 +49,18 @@
         ></v-switch>
       </v-col>
       <v-col cols="12" md="3">
-        <v-text-field v-model="timeout" label="timeout"></v-text-field>
+        <v-switch
+          v-model="timeout"
+          class="ma-2"
+          label="Timeout"
+        ></v-switch>
+      </v-col>
+      <v-col cols="12" md="3">
+        <v-text-field 
+        v-model="timeoutMs" 
+        label="timeout MS" 
+        :disabled="!timeout">
+        </v-text-field>
       </v-col>
     </v-row>
     <v-row>
@@ -65,7 +91,8 @@ export default {
       PatchLink: uuidv4(),
       pubSub: true,
       notification: true,
-      timeout: 60000,
+      timeoutMs: 60000,
+      timeout: true,
       PatchSubscriptions: []
     }
   },
@@ -78,8 +105,10 @@ export default {
         linkCode: this.PatchLink,
         notification: this.notification,
         pubSub: this.pubSub,
-        timeout: this.timeout
+        timeout: this.timeout ? this.timeoutMs : null
       })
+    },
+    generate(){
       this.PatchLink = uuidv4()
     }
   }
