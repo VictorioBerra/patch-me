@@ -1,19 +1,17 @@
 <template v-slot:default>
-  <v-list-item>    
-
+  <v-list-item>
     <v-list-item-icon>
       <v-icon
         @click="cancel"
         text
         color="error"
-        v-if="!completedOn"
+        v-if="!patchSub.completedOn"
         title="cancel"
         >mdi-close-circle-outline</v-icon
       >
     </v-list-item-icon>
 
     <v-list-item-content>
-
       <v-list-item-title>
         <!-- We use the text field for loading bar because when a card is in the loading state nothing is clickable -->
         <v-text-field
@@ -22,34 +20,46 @@
           disabled
           loader-height="3"
           height="1"
-          v-if="!completedState"
+          v-if="!patchSub.completedState"
         >
         </v-text-field>
       </v-list-item-title>
 
-      <v-list-item-subtitle class="text--primary" v-if="completedState">
+      <v-list-item-subtitle
+        class="text--primary"
+        v-if="patchSub.completedState"
+      >
         <v-list-item-content>
-          <span class="success--text" v-if="completedState === 'success'">
-            COMPLETED {{ completedOn | moment('MM/DD h:m:s') }}
+          <span
+            class="success--text"
+            v-if="patchSub.completedState === 'success'"
+          >
+            COMPLETED {{ patchSub.completedOn | moment('MM/DD h:m:s') }}
           </span>
-          <span class="secondary--text" v-if="completedState === 'aborted'">
-            CANCELLED {{ completedOn | moment('MM/DD h:m:s') }}
+          <span
+            class="secondary--text"
+            v-if="patchSub.completedState === 'aborted'"
+          >
+            CANCELLED {{ patchSub.completedOn | moment('MM/DD h:m:s') }}
           </span>
-          <span class="secondary--text" v-if="completedState === 'timedout'">
-            TIMEOUT {{ completedOn | moment('MM/DD h:m:s') }}
+          <span
+            class="secondary--text"
+            v-if="patchSub.completedState === 'timedout'"
+          >
+            TIMEOUT {{ patchSub.completedOn | moment('MM/DD h:m:s') }}
           </span>
         </v-list-item-content>
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
-          <strong>Url:</strong>
-          <a href="fullUrl">{{ fullUrl }}</a>
+        <strong>Url:</strong>
+        <a href="fullUrl">{{ patchSub.fullUrl }}</a>
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
-        <div v-if="!completedState">
+        <div v-if="!patchSub.completedState">
           <strong>Publish with CURL:</strong>
-          <span class="text--primary">curl {{ fullUrl }} -d "Hello World"</span>
+          <kbd>curl {{ patchSub.fullUrl }} -d "Hello World"</kbd>
         </div>
       </v-list-item-subtitle>
 
@@ -58,18 +68,18 @@
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
-        <strong>Timeout: </strong><span>{{ patchSub.timeout > 0 ? patchSub.timeout : "none" }}</span>
+        <strong>Timeout: </strong
+        ><span>{{ patchSub.timeout > 0 ? patchSub.timeout : 'none' }}</span>
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
-        <div v-if="responseAsText">
+        <div v-if="patchSub.responseAsText">
           <strong class="title success--text">Response:</strong>
-          <p>{{ responseAsText }}</p>
+          <p>{{ patchSub.responseAsText }}</p>
         </div>
       </v-list-item-subtitle>
-      
-      <v-divider></v-divider>
 
+      <v-divider></v-divider>
     </v-list-item-content>
   </v-list-item>
 </template>
@@ -84,97 +94,82 @@ export default {
   },
   data() {
     return {
-      responseAsText: null,
-      fullUrl: null,
 
-      completedOn: false,
-      completedState: null,
-
-      // TODO: How to use private instance variables?
-      abortController: new AbortController()
     }
   },
   computed: {
-    completed: {
-      // getter
-      get: function() {
-        return {
-          completedOn: this.completedOn,
-          completedState: this.completedState
-        }
-      },
-      // setter
-      set: function(state) {
-        this.completedOn = new Date()
-        this.completedState = state
-
-        if (this.patchSub.notification) {
-          if (process.client) {
-            let body = ''
-
-            if (state === 'success') {
-              body += '\n' + this.responseAsText
-            } else {
-              body += this.patchSub.linkCode
-            }
-
-            this.$notification.show(
-              `Patch Me: ${state}`,
-              {
-                body: body
-              },
-              {}
-            )
-          }
-        }
-      }
-    }
   },
   created: async function() {
-    if (this.patchSub.linkCode.length == 0) {
-      throw Error('link is a required parameter!')
-    }
+    const abortController = new AbortController()
 
-    const signal = this.abortController.signal
+    const signal = abortController.signal
 
-    if(this.patchSub.timeout > 0) {
+    if (this.patchSub.timeout > 0) {
       // If user cancels, dont trigger this timeout.
-      this.abortTimeout = setTimeout(() => {
-        this.abortController.abort()
-          // This is needed to let the abort trigger the below try/catch. Aborting causes the fetch to throw.
-          setTimeout(() => {
-            this.completed = 'timedout'
-          });
+      this.patchSub.abortTimeout = setTimeout(() => {
+        abortController.abort()
+        // This is needed to let the abort trigger the below try/catch. Aborting causes the fetch to throw.
+        setTimeout(() => {
+          this.setCompleted('timedout');
+          this.maybeNotify()
+        })
       }, this.patchSub.timeout)
     }
 
-    this.fullUrl = this.patchSub.patchBaseUrl + this.patchSub.linkCode
-
     // TODO: Use a URL builder instead of this, fine for MVP.
     if (this.patchSub.pubSub) {
-      this.fullUrl += '?pubsub=true'
+      this.patchSub.fullUrl += '?pubsub=true'
     }
 
     try {
-      const response = await fetch(this.fullUrl, { signal })
+      const response = await fetch(this.patchSub.fullUrl, { signal })
       const responseAsText = await response.text()
 
-      this.responseAsText = responseAsText
-      this.completed = 'success'
+      this.patchSub.responseAsText = responseAsText
+      this.setCompleted('success');
+      this.maybeNotify()
     } catch (err) {
       console.log(err)
       if (err.name === 'AbortError') {
-        this.completed = 'aborted'
+        this.setCompleted('aborted');
+        this.maybeNotify()
       }
     } finally {
-      clearTimeout(this.abortTimeout)
+      clearTimeout(this.patchSub.abortTimeout)
     }
   },
   methods: {
+    setCompleted(completedState) {
+        this.patchSub.completedOn = new Date()
+        this.patchSub.completedState = completedState
+    },
     cancel() {
-      clearTimeout(this.abortTimeout)
-      this.abortController.abort()
-      this.completed = 'aborted'
+      clearTimeout(this.patchSub.abortTimeout)
+      abortController.abort()
+      this.setCompleted('aborted');
+      this.maybeNotify()
+    },
+    maybeNotify() {
+      if (this.patchSub.notification) {
+        // process.client tells us if we are running client side or server side.
+        if (process.client) {
+          let body = ''
+
+          if (this.patchSub.completedState === 'success') {
+            body += '\n' + this.patchSub.responseAsText
+          } else {
+            body += this.patchSub.linkCode
+          }
+
+          this.$notification.show(
+            `Patch Me: ${this.patchSub.completedState}`,
+            {
+              body: body
+            },
+            {}
+          )
+        }
+      }
     }
   }
 }

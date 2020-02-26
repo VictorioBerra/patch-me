@@ -38,6 +38,10 @@ export default {
       src: '~/plugins/vue-native-notification.js',
       mode: 'client'
     },
+    { 
+      src: '~/plugins/vuex-persist', 
+      ssr: false 
+    },
     '~/plugins/vue-moment.js'
   ],
   /*
