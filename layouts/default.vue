@@ -43,7 +43,12 @@
         <nuxt />
       </v-container>
     </v-content>
-    <v-navigation-drawer v-model="rightDrawer" :right="right" temporary fixed>
+    <v-navigation-drawer 
+    v-model="rightDrawer" 
+    :right="right" 
+    width="512"
+    temporary 
+    fixed>
       <v-list>
         <v-list-item @click.native="right = !right">
           <v-list-item-action>
@@ -62,6 +67,7 @@
       >
         <v-list-item>
           <v-list-item-content>
+            <router-link to="/publisher">Go to Full Publisher</router-link>
             <Publisher />
           </v-list-item-content>
         </v-list-item>
@@ -98,7 +104,7 @@ export default {
           to: '/publisher'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-information-variant',
           title: 'About',
           to: '/about'
         }

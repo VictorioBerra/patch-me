@@ -8,7 +8,7 @@
         ></v-text-field>
       </v-col>
       <v-col cols="12" md="4">
-        <v-text-field v-model="PatchLink" label="Patch Link"></v-text-field>
+        <v-text-field v-model="patchLink" label="Patch Link"></v-text-field>
       </v-col>
       <v-col cols="12" md="2">
         <v-btn
@@ -30,11 +30,12 @@
           large
           block
           @click="add"
-          :disabled="PatchLink.length <= 6"
+          :disabled="patchLink.length <= 6"
           class="deep-purple accent-4"
         >
           Add
         </v-btn>
+        <!-- TODO: Add a button to copy the current configuration over to the publisher. And maybe back again. -->
       </v-col>
     </v-row>
     <v-row>
@@ -77,8 +78,7 @@
 </template>
 
 <script>
-import uuidv4 from 'uuid/v4'
-
+import { mapGetters, mapActions } from "vuex";
 import SubscriptionItem from '~/components/SubscriptionItem.vue'
 
 export default {
@@ -88,7 +88,6 @@ export default {
   data() {
     return {
       PatchBaseUrl: 'https://patchbay.pub/',
-      PatchLink: uuidv4(),
       pubSub: true,
       notification: true,
       timeoutMs: 60000,
@@ -96,20 +95,31 @@ export default {
       PatchSubscriptions: []
     }
   },
-  computed: {},
+  computed:{
+    ...mapGetters(['patchLink'])
+  },
   methods: {
+    ...mapActions({
+      generate: 'newLinkCode'
+    }),
     add() {
+      
       this.PatchSubscriptions.push({
         id: this.PatchSubscriptions.length + 1,
-        patchBaseUrl: this.PatchBaseUrl,
-        linkCode: this.PatchLink,
+        fullUrl: this.PatchBaseUrl + this.patchLink,
         notification: this.notification,
         pubSub: this.pubSub,
-        timeout: this.timeout ? this.timeoutMs : null
+        timeout: this.timeout ? this.timeoutMs : null,
+
+        responseAsText: null,
+        completedOn: false,
+        completedState: null
       })
-    },
-    generate(){
-      this.PatchLink = uuidv4()
+    }
+  },
+  created() {
+    if(this.patchLink === '') {
+      this.$store.dispatch('newLinkCode'); // Todo move to constants file.
     }
   }
 }
