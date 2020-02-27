@@ -17,7 +17,7 @@
     "uuid": "^3.4.0",
     "vue-moment": "^4.1.0",
     "vue-native-notification": "^1.0.5",
-    "vuex-persist": "^2.2.0"
+    "vuex-persistedstate": "^2.7.1"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.10.3",

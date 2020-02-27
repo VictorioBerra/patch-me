@@ -39,7 +39,7 @@ export default {
       mode: 'client'
     },
     { 
-      src: '~/plugins/vuex-persist', 
+      src: '~/plugins/localStorage.js', 
       ssr: false 
     },
     '~/plugins/vue-moment.js'
