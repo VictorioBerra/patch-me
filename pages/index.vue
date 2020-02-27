@@ -96,24 +96,20 @@ export default {
     }
   },
   computed:{
-    ...mapGetters(['patchLink'])
+    ...mapGetters({
+      patchLink: 'patchLink' // TODO: Test with shorthand prop
+    })
   },
   methods: {
     ...mapActions({
       generate: 'newLinkCode'
     }),
     add() {
-      
-      this.PatchSubscriptions.push({
-        id: this.PatchSubscriptions.length + 1,
+      this.$store.dispatch('subscription/addSubscription', {
         fullUrl: this.PatchBaseUrl + this.patchLink,
         notification: this.notification,
         pubSub: this.pubSub,
-        timeout: this.timeout ? this.timeoutMs : null,
-
-        responseAsText: null,
-        completedOn: false,
-        completedState: null
+        timeout: this.timeout ? this.timeoutMs : null
       })
     }
   },

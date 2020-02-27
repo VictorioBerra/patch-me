@@ -150,26 +150,26 @@ export default {
       this.maybeNotify()
     },
     maybeNotify() {
-      if (this.patchSub.notification) {
-        // process.client tells us if we are running client side or server side.
-        if (process.client) {
-          let body = ''
+      // if (this.patchSub.notification) {
+      //   // process.client tells us if we are running client side or server side.
+      //   if (process.client) {
+      //     let body = ''
 
-          if (this.patchSub.completedState === 'success') {
-            body += '\n' + this.patchSub.responseAsText
-          } else {
-            body += this.patchSub.linkCode
-          }
+      //     if (this.patchSub.completedState === 'success') {
+      //       body += '\n' + this.patchSub.responseAsText
+      //     } else {
+      //       body += this.patchSub.linkCode
+      //     }
 
-          this.$notification.show(
-            `Patch Me: ${this.patchSub.completedState}`,
-            {
-              body: body
-            },
-            {}
-          )
-        }
-      }
+      //     this.$notification.show(
+      //       `Patch Me: ${this.patchSub.completedState}`,
+      //       {
+      //         body: body
+      //       },
+      //       {}
+      //     )
+      //   }
+      // }
     }
   }
 }
