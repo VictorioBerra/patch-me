@@ -1,11 +1,3 @@
-
-
-// const vuexLocal = new VuexPersistence({
-//   storage: window.localStorage
-// })
-
-// export const plugins = [vuexLocal.plugin];
-
 export const state = () => ({
   publishedRequests: [],
   nextId: 1
@@ -32,9 +24,8 @@ export const actions = {
 }
 
 export const mutations = {
-  setPublishedRequests: (state, publishedRequests) => (state.publishedRequests = publishedRequests),
   newPublishedRequest: (state, publishedRequests) => state.publishedRequests.push(publishedRequests),
   removePublishedRequest: (state, id) =>
     (state.publishedRequests = state.publishedRequests.filter(publishedRequests => publishedRequests.id !== id)),
-    incrementLastId:  (state) => state.nextId++,
+  incrementLastId:  (state) => state.nextId++,
 }
