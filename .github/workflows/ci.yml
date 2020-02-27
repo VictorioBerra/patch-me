@@ -1,6 +1,14 @@
 name: CI
 
-on: [push]
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
@@ -35,6 +43,8 @@ jobs:
 
     # Upload to S3
     - name: sync s3
+      # Do not deploy anything other than master
+      if: github.ref == 'refs/heads/master'    
       uses: jakejarvis/s3-sync-action@master
       with:
         args: --acl public-read --follow-symlinks --delete
@@ -47,6 +57,8 @@ jobs:
 
     # Invalidate Cloudfront
     - name: invalidate
+      # Do not deploy anything other than master
+      if: github.ref == 'refs/heads/master'        
       uses: chetan/invalidate-cloudfront-action@master
       env:
         DISTRIBUTION: ${{ secrets.DISTRIBUTION }}
