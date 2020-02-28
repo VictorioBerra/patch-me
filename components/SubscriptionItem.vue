@@ -115,20 +115,14 @@ export default {
   computed: {
   },
   created() {
-    this.$store.watch(
-      (state, getters) => {
-        let subscription = getters['subscription/getSubscriptionById'](this.subscription.id);
+    this.$store.subscribe((mutation, state) => {
+      if(mutation.type === 'subscription/setSubscriptionCompletedState') {
+        let subscription = state.subscription.subscriptions[this.subscription.id];
         if(subscription) {
-          return subscription.completedOn;
+          this.maybeNotify(subscription, mutation.payload);
         }
-      },
-      (newValue, oldValue) => {
-        if(typeof oldValue === "undefined" &&
-          typeof newValue !== "undefined") {
-          // We only care if the completedOn was not set until now.
-          this.maybeNotify();
-        }
-      });
+      }
+    })      
   },
   methods: {
     cancel() {
@@ -158,25 +152,24 @@ export default {
           });
       }
     },
-    maybeNotify() {
-      if (this.subscription.notification) {
+    maybeNotify(subscription, completedRequest) {
+      if (subscription.notification) {
         // process.client tells us if we are running client side or server side.
         if (process.client) {
           let body = ''
 
-          if (this.subscription.completedState === 'success') {
-            body += '\n' + this.subscription.responseAsText
+          if (completedRequest.completedState === 'success') {
+            body += '\n' + subscription.responseAsText
           } else {
-            body += this.subscription.url
+            body += subscription.url
           }
 
           this.$notification.show(
-            `Patch Me: ${this.subscription.completedState}`,
+            `Patch Me: ${completedRequest.completedState}`,
             {
               body: body
             },
-            {}
-          )
+          {})
         }
       }
     }

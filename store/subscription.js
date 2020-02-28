@@ -41,8 +41,15 @@ export const actions = {
   },
   generateAndUpdatePatchLink({ commit }) {
     commit('setPatchLink', uuidv4())
-  },  
-  async addSubscription({ commit, state }, subscriptionRequest) {
+  },
+  setCompleted({ commit }, setCompletedRequest) {
+    commit('setSubscriptionCompletedState', {
+      id: setCompletedRequest.id,
+      completedState: setCompletedRequest.completedState,
+      completedOn: new Date(),
+    })
+  },
+  async addSubscription({ commit, dispatch, state }, subscriptionRequest) {
 
     const id = state.nextId
 
@@ -80,27 +87,41 @@ export const actions = {
             cancel 
           })
         }),
-        responseType: 'text'
+        responseType: 'text',
+        // https://github.com/axios/axios/issues/907
+        transformResponse: [(data) => { return data; }],
       })
 
-      commit('setSubscriptionResponseText', { 
+      await commit('setSubscriptionResponseText', { 
         id,
-        responseAsText: response.data
+        responseAsText: response
       })
       
-      setCompleted(commit, id, 'success');
+      dispatch('setCompleted', {
+        id,
+        completedState: 'success'
+      });
     } catch (err) {
       if (!err.message) {
         // Axios doesn't seem to tell us anything if an abort happens
-        setCompleted(commit, 'aborted');
+        dispatch('setCompleted', {
+          id,
+          completedStae: 'aborted'
+        });        
         return;
       }
       if(err.message.indexOf('Network Error') > -1){
         console.error(err)
-        setCompleted(commit, id, 'failed');
+        dispatch('setCompleted', {
+          id,
+          completedState: 'failed'
+        });             
       }
       if(err.message.indexOf('timeout') > -1){
-        setCompleted(commit, id, 'timedout');
+        dispatch('setCompleted', {
+          id,
+          completedState: 'timedout'
+        });           
       }
     }
 
@@ -160,12 +181,4 @@ export const mutations = {
     }
   },
   incrementLastId:  (state) => state.nextId++,
-}
-
-function setCompleted(commit, id, completedState) {
-  commit('setSubscriptionCompletedState', {
-    id,
-    completedOn: new Date(),
-    completedState: completedState
-  })
 }
