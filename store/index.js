@@ -4,7 +4,7 @@ export const state = () => ({
     // Serves as a starting default for the patchbay path across all components.
     // The idea is to not keep them synced after that initial state set.
     patchLink: uuidv4(),
-    patchUrl: 'http://localhost:9001',// 'https://patchbay.pub/'
+    patchUrl: 'https://patchbay.pub/'
 })
 
 export const actions = {

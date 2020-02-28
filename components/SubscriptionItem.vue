@@ -143,7 +143,7 @@ export default {
     },
     async remove() {
       if(!this.subscription.completedOn) {
-        const res = await this.$confirm('Operation in progress. Remove this result?', { title: 'Remove?', color: "red darken-3" })
+        const res = await this.$dialog.confirm({ text: 'Operation in progress. Remove this result?', title: 'Remove?' })
         if (res) {
           await this.$store.dispatch('subscription/cancelSubscription', {
             id: this.subscription.id

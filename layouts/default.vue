@@ -127,12 +127,15 @@ export default {
   },
   methods: {
     async reset(){
-      const res = await this.$confirm(`
-      Are you sure you want to reset the environment to defaults?
-      </br>
-      </br>
-      This will delete all histor and reload the page.
-      `, { title: 'Clear Everything?', color: "red darken-3" })
+      const res = await this.$dialog.confirm({ 
+          text: `
+            Are you sure you want to reset the environment to defaults?
+            </br>
+            </br>
+            This will delete all histor and reload the page.
+            `,
+          title: 'Clear Everything?'
+        })
       if (res) {
         this.$store.dispatch('reset');
       }

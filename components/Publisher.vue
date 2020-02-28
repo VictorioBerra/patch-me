@@ -87,14 +87,13 @@ export default {
           method: 'post',
           body: this.PatchPayload
         })
-        // this.PatchPayload = '';
         this.add({
           patchUrl: url,
           patchPayload: this.patchPayload, 
           patchPubSub: this.pubSub
         });
       } catch {
-        // TODO Vue toast/notifications
+        this.$dialog.notify.error(`POST to url failed. Check your URL and link, verify the patch service is up.`)        
       }
     }
   }
