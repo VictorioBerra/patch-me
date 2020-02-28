@@ -141,12 +141,15 @@ export const actions = {
       timeout: stateSubscription.timeout,
     });
   },  
-  cancelSubscription({ commit, state }, payload){
+  cancelSubscription({ dispatch, state }, payload){
     const stateSubscription = { ...state.subscriptions[payload.id] };
     // completedState can only be set once.
     if(stateSubscription) {
       stateSubscription.cancel();
-      setCompleted(commit, payload.id, 'aborted');
+      dispatch('setCompleted', {
+        id: payload.id,
+        completedState: 'aborted'
+      });      
     }
   }
 }

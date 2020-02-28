@@ -114,12 +114,15 @@ export default {
   props: ['subscription'],
   computed: {
   },
-  created() {
+  created() { var self = this;
     this.$store.subscribe((mutation, state) => {
-      if(mutation.type === 'subscription/setSubscriptionCompletedState') {
+      if(mutation.type === 'subscription/setSubscriptionCompletedState' &&
+          //Check the mutation was intended for this component.
+          // Otherwise every component calls notify. This may not scale well.
+          mutation.payload.id === self.subscription.id) {
         let subscription = state.subscription.subscriptions[this.subscription.id];
         if(subscription) {
-          this.maybeNotify(subscription, mutation.payload);
+          this.maybeNotify(subscription);
         }
       }
     })      
@@ -152,20 +155,26 @@ export default {
           });
       }
     },
-    maybeNotify(subscription, completedRequest) {
+    maybeNotify(subscription) {
+
+      // They know.
+      if(subscription.completedState === 'aborted') {
+        return
+      }
+
       if (subscription.notification) {
         // process.client tells us if we are running client side or server side.
         if (process.client) {
           let body = ''
 
-          if (completedRequest.completedState === 'success') {
+          if (subscription.completedState === 'success') {
             body += '\n' + subscription.responseAsText
           } else {
             body += subscription.url
           }
 
           this.$notification.show(
-            `Patch Me: ${completedRequest.completedState}`,
+            `Patch Me: ${subscription.completedState}`,
             {
               body: body
             },
