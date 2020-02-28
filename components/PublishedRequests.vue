@@ -31,10 +31,6 @@ export default {
       ...mapState('publisher', {
           allPublishedRequests: state => state.publishedRequests,
       })
-  },
-  created: function(){
-  },
-  methods: {
   }
 }
 </script>

@@ -20,15 +20,15 @@ export const getters = {
   getPatchLink: (state, getters, rootState) => {
     if(state.patchLink == '') {
       return rootState.patchLink;
-     }
-     return state.patchLink;
-   },
+    }
+    return state.patchLink;
+  },
 
   getPatchBaseUrl: (state, getters, rootState) => {
-   if(state.patchBaseUrl == '') {
-    return rootState.patchUrl;
-   }
-   return state.patchBaseUrl;
+    if(state.patchBaseUrl == '') {
+      return rootState.patchUrl;
+    }
+    return state.patchBaseUrl;
   }
 }
 
@@ -39,7 +39,7 @@ export const actions = {
   updatePatchLink({ commit }, patchLinkRequest) {
     commit('setPatchLink', patchLinkRequest.patchLink)
   },
-  generateAndUpdatePatchLink({ commit }, patchLinkRequest) {
+  generateAndUpdatePatchLink({ commit }) {
     commit('setPatchLink', uuidv4())
   },  
   async addSubscription({ commit, state }, subscriptionRequest) {
