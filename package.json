@@ -12,10 +12,13 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.9.5",
+    "build-url": "^2.0.0",
     "nuxt": "^2.11.0",
     "uuid": "^3.4.0",
     "vue-moment": "^4.1.0",
-    "vue-native-notification": "^1.0.5"
+    "vue-native-notification": "^1.0.5",
+    "vuetify-dialog": "^2.0.1",
+    "vuex-persistedstate": "^2.7.1"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.10.3",

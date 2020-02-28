@@ -22,6 +22,16 @@
             <v-list-item-title v-text="item.title" />
           </v-list-item-content>
         </v-list-item>
+        <v-list-item @click="reset">
+          <v-list-item-action>
+            <v-icon>mdi-delete-outline</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>
+              Reset Local State
+            </v-list-item-title>
+          </v-list-item-content> 
+        </v-list-item>       
       </v-list>
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app>
@@ -43,7 +53,12 @@
         <nuxt />
       </v-container>
     </v-content>
-    <v-navigation-drawer v-model="rightDrawer" :right="right" temporary fixed>
+    <v-navigation-drawer 
+    v-model="rightDrawer" 
+    :right="right" 
+    width="512"
+    temporary 
+    fixed>
       <v-list>
         <v-list-item @click.native="right = !right">
           <v-list-item-action>
@@ -62,6 +77,7 @@
       >
         <v-list-item>
           <v-list-item-content>
+            <router-link to="/publisher">Go to Full Publisher</router-link>
             <Publisher />
           </v-list-item-content>
         </v-list-item>
@@ -98,7 +114,7 @@ export default {
           to: '/publisher'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-information-variant',
           title: 'About',
           to: '/about'
         }
@@ -107,6 +123,22 @@ export default {
       right: true,
       rightDrawer: false,
       title: 'Patch Me'
+    }
+  },
+  methods: {
+    async reset(){
+      const res = await this.$dialog.confirm({ 
+          text: `
+            Are you sure you want to reset the environment to defaults?
+            </br>
+            </br>
+            This will delete all histor and reload the page.
+            `,
+          title: 'Clear Everything?'
+        })
+      if (res) {
+        this.$store.dispatch('reset');
+      }
     }
   }
 }

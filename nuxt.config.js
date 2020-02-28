@@ -38,6 +38,10 @@ export default {
       src: '~/plugins/vue-native-notification.js',
       mode: 'client'
     },
+    { 
+      src: '~/plugins/localStorage.js', 
+      ssr: false 
+    },
     '~/plugins/vue-moment.js'
   ],
   /*
@@ -49,8 +53,13 @@ export default {
    */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    ['vuetify-dialog/nuxt', { property: '$dialog' }]
   ],
+  // Optionally passing options in module top level configuration
+  vuetifyDialog: {
+    property: '$dialog'
+  },  
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options

@@ -3,15 +3,23 @@
     <v-row>
       <v-col>
         <v-text-field
-          v-model="PatchUrl"
-          label="Patch Base Url"
+          v-model="patchBaseUrl"
+          label="Patch Url"
         ></v-text-field>
       </v-col>
     </v-row>
-        <v-row>
+    <v-row>
       <v-col>
         <v-text-field
-          v-model="PatchPayload"
+          v-model="patchLink"
+          label="Patch Link"
+        ></v-text-field>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-text-field
+          v-model="patchPayload"
           label="Payload"
         ></v-text-field>
       </v-col>
@@ -21,45 +29,80 @@
             <v-switch v-model="pubSub" class="ma-2" label="PubSub"></v-switch>
         </v-col>
     </v-row>
-        <v-row>
+    <v-row>
         <v-col>
           <v-btn block color="secondary" dark @click="post">POST</v-btn>
         </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+          <PublishedRequests></PublishedRequests>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-
-// Todo: would be dope if I could get the last URL generated on the index page
+import { mapState, mapActions } from 'vuex'
+import PublishedRequests from '~/components/PublishedRequests.vue'
+import buildUrl from 'build-url';
 
 export default {
+  components: {
+    PublishedRequests
+  },
   data() {
     return {
-      PatchUrl: 'https://patchbay.pub/',
-      PatchPayload: '',
+      patchPayload: '{ "Hello": "World" }',
       pubSub: true
     }
   },
-  computed: {},
+  computed: {
+    patchBaseUrl: {
+      set(patchBaseUrl) {
+        this.$store.dispatch('publisher/updatePatchBaseUrl', { patchBaseUrl })
+      },
+      get() {
+        return this.$store.getters['publisher/getPatchBaseUrl']
+      }
+    },
+    patchLink: {
+      set(patchLink) {
+        this.$store.dispatch('publisher/updatePatchLink', { patchLink })
+      },
+      get() {
+        return this.$store.getters['publisher/getPatchLink']
+      }
+    }, 
+  },
   methods: {
+    ...mapActions({
+      add: 'publisher/addPublishedRequest'
+    }),
     async post() {
 
-      if(this.pubSub) {
-          this.PatchUrl += '?pubsub=true'
-      }
+      const url = buildUrl(this.patchBaseUrl, {
+        path: this.patchLink,
+        queryParams: {
+          pubsub: this.pubSub
+        }
+      });
 
       try
       {
-        const response = await fetch(this.PatchUrl, {
+        const response = await fetch(url, {
           method: 'post',
-          body: this.PatchPayload
+          body: this.patchPayload
         })
-         this.PatchPayload = '';
-      } catch {
-        // TODO Vue toast/notifications
-      }
 
+        this.add({
+          patchUrl: url,
+          patchPayload: this.patchPayload, 
+          patchPubSub: this.pubSub
+        });
+      } catch {
+        this.$dialog.notify.error(`POST to url failed. Check your URL and link, verify the patch service is up.`)        
+      }
     }
   }
 }
