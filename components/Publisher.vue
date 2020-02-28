@@ -54,7 +54,7 @@ export default {
   data() {
     return {
       patchUrl: '',
-      patchPayload: '',
+      patchPayload: '{ "Hello": "World" }',
       pubSub: true
     }
   },
