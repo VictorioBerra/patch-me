@@ -85,8 +85,9 @@ export default {
       {
         const response = await fetch(url, {
           method: 'post',
-          body: this.PatchPayload
+          body: this.patchPayload
         })
+
         this.add({
           patchUrl: url,
           patchPayload: this.patchPayload, 
