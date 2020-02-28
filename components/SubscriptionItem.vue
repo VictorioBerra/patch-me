@@ -152,6 +152,10 @@ export default {
             id: this.subscription.id
           });
         }
+      } else {
+          this.$store.dispatch('subscription/removeSubscription', {
+            id: this.subscription.id
+          });
       }
     },
     maybeNotify() {
