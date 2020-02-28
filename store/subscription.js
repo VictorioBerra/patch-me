@@ -3,6 +3,7 @@ import Vue from 'vue'
 
 export const state = () => ({
   subscriptions: {},
+  patchBaseUrl: '',
   nextId: 1
 })
 
@@ -10,10 +11,14 @@ export const getters = {
   subscriptions:  (state) => state.subscriptions,
   getSubscriptionById: (state) => (id) => {
     return state.subscriptions[id];
-  }
+  },
+  //getPatchBaseUrl: (state, getters, rootState) -> {} // TODO
 }
 
 export const actions = {
+  updatePatchBaseUrl({ commit }, patchBaseUrlRequest) {
+    commit('setPatchBaseUrl', patchBaseUrlRequest.patchBaseUrl)
+  },
   async addSubscription({ commit, state }, subscriptionRequest) {
 
     const id = state.nextId
@@ -104,6 +109,7 @@ export const actions = {
 
 export const mutations = {
   newSubscription:  (state, subscription) => Vue.set(state.subscriptions, subscription.id, subscription),
+  setPatchBaseUrl:  (state, patchBaseUrl) => state.patchBaseUrl = patchBaseUrl,
   setSubscriptionCancel:  (state, subscription) => {
     const stateSubscription = state.subscriptions[subscription.id];
     // completedState can only be set once.

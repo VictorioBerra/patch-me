@@ -87,7 +87,6 @@ export default {
   },
   data() {
     return {
-      patchBaseUrl: '',
       patchLink: '',
 
       pubsub: true,
@@ -103,7 +102,16 @@ export default {
     ...mapState({
       initialPatchUrl: 'patchUrl',
       initialPatchLink: 'patchLink'
-    })
+    }),
+    patchBaseUrl: {
+      set(patchBaseUrl) {
+        this.$store.dispatch('subscription/updatePatchBaseUrl', { patchBaseUrl })
+      },
+      get() {
+        // TODO, try with getter, and access rootate for defaults.
+        return this.$store.state.subscription.patchBaseUrl
+      }
+    },    
   },
   methods: {
     ...mapActions({
