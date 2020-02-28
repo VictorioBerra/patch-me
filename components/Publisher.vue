@@ -3,15 +3,23 @@
     <v-row>
       <v-col>
         <v-text-field
-          v-model="PatchUrl"
-          label="Patch Base Url"
+          v-model="patchUrl"
+          label="Patch Url"
         ></v-text-field>
       </v-col>
     </v-row>
-        <v-row>
+    <v-row>
       <v-col>
         <v-text-field
-          v-model="PatchPayload"
+          v-model="patchLink"
+          label="Patch Link"
+        ></v-text-field>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-text-field
+          v-model="patchPayload"
           label="Payload"
         ></v-text-field>
       </v-col>
@@ -35,7 +43,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import PublishedRequests from '~/components/PublishedRequests.vue'
 import buildUrl from 'build-url';
 
@@ -45,15 +53,20 @@ export default {
   },
   data() {
     return {
-      PatchUrl: 'https://patchbay.pub/',
-      PatchPayload: '',
+      patchUrl: '',
+      patchPayload: '',
       pubSub: true
     }
   },
+  computed: {
+    ...mapState({
+      initialPatchUrl: 'patchUrl',
+      initialPatchLink: 'patchLink'
+    })
+  },
   created: function(){
-    if(this.$store.state.patchLink !== '') {
-      this.PatchUrl += this.$store.state.patchLink;
-    }
+    this.patchUrl = this.initialPatchUrl;
+    this.patchLink = this.initialPatchLink;
   },
   methods: {
     ...mapActions({
@@ -61,8 +74,8 @@ export default {
     }),
     async post() {
 
-
-      const url = buildUrl(this.PatchUrl, {
+      const url = buildUrl(this.patchUrl, {
+        path: this.patchLink,
         queryParams: {
           pubsub: this.pubSub
         }
@@ -76,8 +89,8 @@ export default {
         })
         // this.PatchPayload = '';
         this.add({
-          patchUrl: this.PatchUrl,
-          patchPayload: this.PatchPayload, 
+          patchUrl: url,
+          patchPayload: this.patchPayload, 
           patchPubSub: this.pubSub
         });
       } catch {

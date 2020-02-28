@@ -25,5 +25,11 @@ $ npm run generate
 
 # TODO
 
+- Constants file https://github.com/gothinkster/vue-realworld-example-app/blob/master/src/store/actions.type.js
+- Allow changing the defaultUrl
+
+- Maybe ditch the publisher entirely and allow adding a payload/POST toggle?
+- JSON type checkbox?
+
 - Allow removing timeout records
 - Pass last patch link to publisher component

@@ -42,6 +42,10 @@ export default {
       src: '~/plugins/localStorage.js', 
       ssr: false 
     },
+    { 
+      src: '~/plugins/dialog.js', 
+      mode: 'client' 
+    },
     '~/plugins/vue-moment.js'
   ],
   /*

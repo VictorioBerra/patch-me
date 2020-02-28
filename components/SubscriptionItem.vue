@@ -1,15 +1,5 @@
 <template v-slot:default>
   <v-list-item>
-    <v-list-item-icon>
-      <v-icon
-        @click="cancel"
-        text
-        color="error"
-        v-if="!patchSub.completedOn"
-        title="cancel"
-        >mdi-close-circle-outline</v-icon
-      >
-    </v-list-item-icon>
 
     <v-list-item-content>
       <v-list-item-title>
@@ -20,156 +10,171 @@
           disabled
           loader-height="3"
           height="1"
-          v-if="!patchSub.completedState"
+          v-if="!subscription.completedState"
         >
         </v-text-field>
       </v-list-item-title>
 
       <v-list-item-subtitle
         class="text--primary"
-        v-if="patchSub.completedState"
+        v-if="subscription.completedState"
       >
+        <!-- TODO: Move stuff like this into its own component -->
         <v-list-item-content>
           <span
             class="success--text"
-            v-if="patchSub.completedState === 'success'"
+            v-if="subscription.completedState === 'success'"
           >
-            COMPLETED {{ patchSub.completedOn | moment('MM/DD h:m:s') }}
+            COMPLETED {{ subscription.completedOn | moment('MM/DD h:m:s') }}
           </span>
           <span
             class="secondary--text"
-            v-if="patchSub.completedState === 'aborted'"
+            v-if="subscription.completedState === 'aborted'"
           >
-            CANCELLED {{ patchSub.completedOn | moment('MM/DD h:m:s') }}
+            CANCELLED {{ subscription.completedOn | moment('MM/DD h:m:s') }}
           </span>
           <span
             class="secondary--text"
-            v-if="patchSub.completedState === 'timedout'"
+            v-if="subscription.completedState === 'timedout'"
           >
-            TIMEOUT {{ patchSub.completedOn | moment('MM/DD h:m:s') }}
+            TIMEOUT {{ subscription.completedOn | moment('MM/DD h:m:s') }}
           </span>
+          <span
+            class="red--text"
+            v-if="subscription.completedState === 'failed'"
+          >
+            FAILED (see console) {{ subscription.completedOn | moment('MM/DD h:m:s') }}
+          </span>
+          <!-- Inturrupted? -->
         </v-list-item-content>
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
         <strong>Url:</strong>
-        <a href="fullUrl">{{ patchSub.fullUrl }}</a>
+        <a href="subscription.url">{{ subscription.url }}</a>
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
-        <div v-if="!patchSub.completedState">
+        <div v-if="!subscription.completedState">
           <strong>Publish with CURL:</strong>
-          <kbd>curl {{ patchSub.fullUrl }} -d "Hello World"</kbd>
+          <kbd>curl {{ subscription.url }} -d "Hello World"</kbd>
         </div>
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
-        <strong>PubSub: </strong><span>{{ patchSub.pubSub }}</span>
+        <strong>PubSub: </strong><span>{{ subscription.pubsub }}</span>
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
         <strong>Timeout: </strong
-        ><span>{{ patchSub.timeout > 0 ? patchSub.timeout : 'none' }}</span>
+        ><span>{{ subscription.timeout > 0 ? subscription.timeout : 'none' }}</span>
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
-        <div v-if="patchSub.responseAsText">
+        <div v-if="subscription.responseAsText">
           <strong class="title success--text">Response:</strong>
-          <p>{{ patchSub.responseAsText }}</p>
+          <p>{{ subscription.responseAsText }}</p>
         </div>
       </v-list-item-subtitle>
 
-      <v-divider></v-divider>
+    <v-row justify="end">
+      <v-col cols="12" sm="2">
+            <v-btn 
+            v-if="!subscription.completedOn"
+            text
+            color="error"
+            @click="cancel" 
+            title="cancel">cancel
+            </v-btn>
+      </v-col>
+      <v-col cols="12" sm="2">
+        <v-btn 
+          text
+          @click="clone" 
+          title="clone">clone
+          </v-btn>
+      </v-col>
+        <v-col cols="12" sm="2">
+          <v-btn 
+            text
+            color="deep-orange" 
+            @click="remove" 
+            title="remove">remove
+            </v-btn>
+        </v-col>
+      </v-row>
+ 
+    <v-divider></v-divider>
     </v-list-item-content>
   </v-list-item>
 </template>
 
 <script>
 export default {
-  props: {
-    patchSub: {
-      type: Object,
-      required: true // TODO: Maybe make a default function that can auto-generate all the props in here? Also, https://vuejs.org/v2/guide/components-props.html#Type-Checks
-    }
-  },
-  data() {
-    return {
-
-    }
-  },
+  props: ['subscription'],
   computed: {
   },
-  created: async function() {
-    const abortController = new AbortController()
-
-    const signal = abortController.signal
-
-    if (this.patchSub.timeout > 0) {
-      // If user cancels, dont trigger this timeout.
-      this.patchSub.abortTimeout = setTimeout(() => {
-        abortController.abort()
-        // This is needed to let the abort trigger the below try/catch. Aborting causes the fetch to throw.
-        setTimeout(() => {
-          this.setCompleted('timedout');
-          this.maybeNotify()
-        })
-      }, this.patchSub.timeout)
-    }
-
-    // TODO: Use a URL builder instead of this, fine for MVP.
-    if (this.patchSub.pubSub) {
-      this.patchSub.fullUrl += '?pubsub=true'
-    }
-
-    try {
-      const response = await fetch(this.patchSub.fullUrl, { signal })
-      const responseAsText = await response.text()
-
-      this.patchSub.responseAsText = responseAsText
-      this.setCompleted('success');
-      this.maybeNotify()
-    } catch (err) {
-      console.log(err)
-      if (err.name === 'AbortError') {
-        this.setCompleted('aborted');
-        this.maybeNotify()
-      }
-    } finally {
-      clearTimeout(this.patchSub.abortTimeout)
-    }
+  created() {
+    this.$store.watch(
+      (state, getters) => {
+        let subscription = getters['subscription/getSubscriptionById'](this.subscription.id);
+        if(subscription) {
+          return subscription.completedOn;
+        }
+      },
+      (newValue, oldValue) => {
+        if(typeof oldValue === "undefined" &&
+          typeof newValue !== "undefined") {
+          // We only care if the completedOn was not set until now.
+          this.maybeNotify();
+        }
+      });
   },
   methods: {
-    setCompleted(completedState) {
-        this.patchSub.completedOn = new Date()
-        this.patchSub.completedState = completedState
-    },
     cancel() {
-      clearTimeout(this.patchSub.abortTimeout)
-      abortController.abort()
-      this.setCompleted('aborted');
-      this.maybeNotify()
+      this.$store.dispatch('subscription/cancelSubscription', {
+        id: this.subscription.id
+      });
+    },
+    clone() {
+      this.$store.dispatch('subscription/cloneSubscription', {
+        id: this.subscription.id
+      });
+    },
+    async remove() {
+      if(!this.subscription.completedOn) {
+        const res = await this.$confirm('Operation in progress. Remove this result?', { title: 'Remove?', color: "red darken-3" })
+        if (res) {
+          await this.$store.dispatch('subscription/cancelSubscription', {
+            id: this.subscription.id
+          });
+          this.$store.dispatch('subscription/removeSubscription', {
+            id: this.subscription.id
+          });
+        }
+      }
     },
     maybeNotify() {
-      // if (this.patchSub.notification) {
-      //   // process.client tells us if we are running client side or server side.
-      //   if (process.client) {
-      //     let body = ''
+      if (this.subscription.notification) {
+        // process.client tells us if we are running client side or server side.
+        if (process.client) {
+          let body = ''
 
-      //     if (this.patchSub.completedState === 'success') {
-      //       body += '\n' + this.patchSub.responseAsText
-      //     } else {
-      //       body += this.patchSub.linkCode
-      //     }
+          if (this.subscription.completedState === 'success') {
+            body += '\n' + this.subscription.responseAsText
+          } else {
+            body += this.subscription.url
+          }
 
-      //     this.$notification.show(
-      //       `Patch Me: ${this.patchSub.completedState}`,
-      //       {
-      //         body: body
-      //       },
-      //       {}
-      //     )
-      //   }
-      // }
+          this.$notification.show(
+            `Patch Me: ${this.subscription.completedState}`,
+            {
+              body: body
+            },
+            {}
+          )
+        }
+      }
     }
   }
 }

@@ -1,31 +1,27 @@
+import Vue from 'vue'
+
 export const state = () => ({
-  publishedRequests: [],
+  publishedRequests: {},
   nextId: 1
 })
 
-export const getters = {
-  allPublishedRequests: state => state.publishedRequests
-}
+// export const getters = {
+// }
 
 export const actions = {
   async addPublishedRequest({ commit, state }, publishedRequest) {
     commit('incrementLastId')
     commit('newPublishedRequest', {
       id: state.nextId,
+
       url: publishedRequest.patchUrl,
       payload: publishedRequest.patchPayload,
       pubsub: publishedRequest.patchPubSub
     })
-  },
-  async deletePublishedRequest({ commit }, id) {
-    commit('removePublishedRequest', id)
-  },
-  // TODO Filter 
+  }
 }
 
 export const mutations = {
-  newPublishedRequest: (state, publishedRequests) => state.publishedRequests.push(publishedRequests),
-  removePublishedRequest: (state, id) =>
-    (state.publishedRequests = state.publishedRequests.filter(publishedRequests => publishedRequests.id !== id)),
+  newPublishedRequest:  (state, publishedRequest) => Vue.set(state.publishedRequests, publishedRequest.id, publishedRequest),
   incrementLastId:  (state) => state.nextId++,
 }
