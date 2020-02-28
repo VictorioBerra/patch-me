@@ -3,7 +3,7 @@
     <v-row>
       <v-col>
         <v-text-field
-          v-model="patchUrl"
+          v-model="patchBaseUrl"
           label="Patch Url"
         ></v-text-field>
       </v-col>
@@ -53,20 +53,27 @@ export default {
   },
   data() {
     return {
-      patchUrl: '',
       patchPayload: '{ "Hello": "World" }',
       pubSub: true
     }
   },
   computed: {
-    ...mapState({
-      initialPatchUrl: 'patchUrl',
-      initialPatchLink: 'patchLink'
-    })
-  },
-  created: function(){
-    this.patchUrl = this.initialPatchUrl;
-    this.patchLink = this.initialPatchLink;
+    patchBaseUrl: {
+      set(patchBaseUrl) {
+        this.$store.dispatch('publisher/updatePatchBaseUrl', { patchBaseUrl })
+      },
+      get() {
+        return this.$store.getters['publisher/getPatchBaseUrl']
+      }
+    },
+    patchLink: {
+      set(patchLink) {
+        this.$store.dispatch('publisher/updatePatchLink', { patchLink })
+      },
+      get() {
+        return this.$store.getters['publisher/getPatchLink']
+      }
+    }, 
   },
   methods: {
     ...mapActions({
@@ -74,7 +81,7 @@ export default {
     }),
     async post() {
 
-      const url = buildUrl(this.patchUrl, {
+      const url = buildUrl(this.patchBaseUrl, {
         path: this.patchLink,
         queryParams: {
           pubsub: this.pubSub

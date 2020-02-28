@@ -10,20 +10,32 @@
       <v-col cols="12" md="4">
         <v-text-field v-model="patchLink" label="Patch Link"></v-text-field>
       </v-col>
-      <v-col cols="12" md="2">
+      <v-col cols="12" md="1">
         <v-btn
           dark
-          large
+          small
           @click="generate"
           class="primary"
           title="Generate Random"
         >
       <v-icon
-        title="generate random"
         >mdi-refresh</v-icon
       >
         </v-btn>
       </v-col>
+      <v-col cols="12" md="1">
+        <v-btn
+          dark
+          small
+          @click="sync"
+          class="info"
+          title="Sync to Publisher"
+        >
+      <v-icon
+        >mdi-sync</v-icon
+      >
+        </v-btn>
+      </v-col>      
       <v-col cols="12" md="2">
         <v-btn
           dark
@@ -125,6 +137,14 @@ export default {
         notification: this.notification,
         pubsub: this.pubsub,
         timeout: this.timeout ? this.timeoutMs : 0 // axios default is 0
+      })
+    },
+    sync(){
+      this.$store.dispatch('publisher/updatePatchBaseUrl', {
+        patchBaseUrl: this.patchBaseUrl
+      })
+      this.$store.dispatch('publisher/updatePatchLink', {
+        patchLink: this.patchLink
       })
     }
   }
