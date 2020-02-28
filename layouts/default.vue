@@ -22,6 +22,16 @@
             <v-list-item-title v-text="item.title" />
           </v-list-item-content>
         </v-list-item>
+        <v-list-item @click="reset">
+          <v-list-item-action>
+            <v-icon>mdi-delete-outline</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>
+              Reset Local State
+            </v-list-item-title>
+          </v-list-item-content> 
+        </v-list-item>       
       </v-list>
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app>
@@ -113,6 +123,19 @@ export default {
       right: true,
       rightDrawer: false,
       title: 'Patch Me'
+    }
+  },
+  methods: {
+    async reset(){
+      const res = await this.$confirm(`
+      Are you sure you want to reset the environment to defaults?
+      </br>
+      </br>
+      This will delete all histor and reload the page.
+      `, { title: 'Clear Everything?', color: "red darken-3" })
+      if (res) {
+        this.$store.dispatch('reset');
+      }
     }
   }
 }

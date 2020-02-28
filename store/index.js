@@ -16,9 +16,16 @@ export const actions = {
     let newLinkCode = uuidv4();
     commit('generate', newLinkCode)
   },
+  reset({ commit }) {
+    commit('reset') // this will cause the vue-persist-store plugin to set all state to empty
+    location.reload()  
+  }
 }
 
 export const mutations = {
+  reset(state) {
+    state.reset = true
+  },
   setDefaultPatchUrl(state, url) {
     state.defaultPatchUrl = url
   },
