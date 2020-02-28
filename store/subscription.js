@@ -1,9 +1,13 @@
-import buildUrl from 'build-url';
 import Vue from 'vue'
+import buildUrl from 'build-url';
+import uuidv4 from 'uuid/v4'
 
 export const state = () => ({
   subscriptions: {},
+
+  patchLink: '',
   patchBaseUrl: '',
+
   nextId: 1
 })
 
@@ -12,13 +16,32 @@ export const getters = {
   getSubscriptionById: (state) => (id) => {
     return state.subscriptions[id];
   },
-  //getPatchBaseUrl: (state, getters, rootState) -> {} // TODO
+
+  getPatchLink: (state, getters, rootState) => {
+    if(state.patchLink == '') {
+      return rootState.patchLink;
+     }
+     return state.patchLink;
+   },
+
+  getPatchBaseUrl: (state, getters, rootState) => {
+   if(state.patchBaseUrl == '') {
+    return rootState.patchUrl;
+   }
+   return state.patchBaseUrl;
+  }
 }
 
 export const actions = {
   updatePatchBaseUrl({ commit }, patchBaseUrlRequest) {
     commit('setPatchBaseUrl', patchBaseUrlRequest.patchBaseUrl)
   },
+  updatePatchLink({ commit }, patchLinkRequest) {
+    commit('setPatchLink', patchLinkRequest.patchLink)
+  },
+  generateAndUpdatePatchLink({ commit }, patchLinkRequest) {
+    commit('setPatchLink', uuidv4())
+  },  
   async addSubscription({ commit, state }, subscriptionRequest) {
 
     const id = state.nextId
@@ -110,6 +133,7 @@ export const actions = {
 export const mutations = {
   newSubscription:  (state, subscription) => Vue.set(state.subscriptions, subscription.id, subscription),
   setPatchBaseUrl:  (state, patchBaseUrl) => state.patchBaseUrl = patchBaseUrl,
+  setPatchLink:  (state, patchLink) => state.patchLink = patchLink,
   setSubscriptionCancel:  (state, subscription) => {
     const stateSubscription = state.subscriptions[subscription.id];
     // completedState can only be set once.

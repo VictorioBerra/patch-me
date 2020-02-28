@@ -1,20 +1,18 @@
 import uuidv4 from 'uuid/v4'
 
 export const state = () => ({
-    patchLink: '',
+    // Serves as a starting default for the patchbay path across all components.
+    // The idea is to not keep them synced after that initial state set.
+    patchLink: uuidv4(),
     patchUrl: 'http://localhost:9001',// 'https://patchbay.pub/'
 })
-
-export const getters = {
-}
 
 export const actions = {
   updateDefaultPatchUrl({ commit }, payload) {
     commit('setDefaultPatchUrl', payload.url)
   },
   newLinkCode({ commit }) {
-    let newLinkCode = uuidv4();
-    commit('generate', newLinkCode)
+    commit('generate', uuidv4())
   },
   reset({ commit }) {
     commit('reset') // this will cause the vue-persist-store plugin to set all state to empty

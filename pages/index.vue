@@ -87,8 +87,6 @@ export default {
   },
   data() {
     return {
-      patchLink: '',
-
       pubsub: true,
       notification: true,
       timeoutMs: 60000,
@@ -99,23 +97,26 @@ export default {
     ...mapGetters({
       subscriptions: 'subscription/subscriptions'
     }),
-    ...mapState({
-      initialPatchUrl: 'patchUrl',
-      initialPatchLink: 'patchLink'
-    }),
     patchBaseUrl: {
       set(patchBaseUrl) {
         this.$store.dispatch('subscription/updatePatchBaseUrl', { patchBaseUrl })
       },
       get() {
-        // TODO, try with getter, and access rootate for defaults.
-        return this.$store.state.subscription.patchBaseUrl
+        return this.$store.getters['subscription/getPatchBaseUrl']
       }
-    },    
+    },
+    patchLink: {
+      set(patchLink) {
+        this.$store.dispatch('subscription/updatePatchLink', { patchLink })
+      },
+      get() {
+        return this.$store.getters['subscription/getPatchLink']
+      }
+    }, 
   },
   methods: {
     ...mapActions({
-      generate: 'newLinkCode'
+      generate: 'subscription/generateAndUpdatePatchLink'
     }),
     async add() {
       return await this.$store.dispatch('subscription/addSubscription', {
@@ -126,14 +127,6 @@ export default {
         timeout: this.timeout ? this.timeoutMs : 0 // axios default is 0
       })
     }
-  },
-  created() {
-    if(this.patchLink === '') {
-      this.$store.dispatch('newLinkCode');
-    }
-
-    this.patchBaseUrl = this.initialPatchUrl;
-    this.patchLink = this.initialPatchLink;
   }
 }
 </script>
