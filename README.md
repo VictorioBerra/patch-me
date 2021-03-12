@@ -41,7 +41,7 @@ $ npm run start
 $ npm run generate
 ```
 
-# TODO
+## TODO
 
 - Constants file https://github.com/gothinkster/vue-realworld-example-app/blob/master/src/store/actions.type.js
 - Persist the URL and LinkCode on reload
