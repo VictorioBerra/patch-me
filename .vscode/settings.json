@@ -13,6 +13,7 @@
         "titleBar.inactiveForeground": "#e7e7e799",
         "statusBar.background": "#0e1392",
         "statusBarItem.hoverBackground": "#1219c1",
-        "statusBar.foreground": "#e7e7e7"
+        "statusBar.foreground": "#e7e7e7",
+        "activityBar.activeBackground": "#1219c1"
     }
 }
