@@ -71,6 +71,11 @@
       </v-list-item-subtitle>
 
       <v-list-item-subtitle>
+        <strong>Looping: </strong
+        ><span>{{ subscription.loop  ? 'yes ': 'no' }}</span>
+      </v-list-item-subtitle>
+
+      <v-list-item-subtitle>
         <div v-if="subscription.responseAsText">
           <strong class="title success--text">Response:</strong>
           <p>{{ subscription.responseAsText }}</p>
