@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4'
+const { v4: uuidv4 } = require('uuid');
 
 export const state = () => ({
     // Serves as a starting default for the patchbay path across all components.

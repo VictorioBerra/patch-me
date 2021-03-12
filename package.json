@@ -1,6 +1,6 @@
 {
   "name": "patch-me",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A GUI for services like https://patchbay.pub/",
   "author": "Victorio Berra",
   "private": true,
@@ -11,19 +11,19 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "@nuxtjs/axios": "^5.9.5",
-    "build-url": "^2.0.0",
-    "nuxt": "^2.11.0",
-    "uuid": "^3.4.0",
+    "@nuxtjs/axios": "^5.13.1",
+    "build-url": "^6.0.1",
+    "nuxt": "^2.15.3",
+    "uuid": "^8.3.2",
     "vue-moment": "^4.1.0",
-    "vue-native-notification": "^1.0.5",
-    "vuetify-dialog": "^2.0.1",
-    "vuex-persistedstate": "^2.7.1"
+    "vue-native-notification": "^1.1.1",
+    "vuetify-dialog": "^2.0.14",
+    "vuex-persistedstate": "^3.2.0"
   },
   "devDependencies": {
-    "@nuxtjs/vuetify": "^1.10.3",
-    "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-prettier": "^3.1.2",
-    "prettier": "^1.19.1"
+    "@nuxtjs/vuetify": "^1.11.3",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "^2.2.1"
   }
 }
