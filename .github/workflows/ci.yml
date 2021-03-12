@@ -66,11 +66,3 @@ jobs:
         AWS_REGION: 'us-east-1'
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    - uses: 8398a7/action-slack@v2
-      with:
-        status: ${{ job.status }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-      if: always()
