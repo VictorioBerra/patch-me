@@ -51,7 +51,7 @@ export const actions = {
   },
   async addSubscription({ commit, dispatch, state }, subscriptionRequest) {
 
-    const id = state.nextId
+    const id = state.nextId;
 
     const finalUrl = buildUrl(subscriptionRequest.url, {
       path: subscriptionRequest.path,
@@ -70,6 +70,7 @@ export const actions = {
 
       notification: subscriptionRequest.notification,
       timeout: subscriptionRequest.timeout,
+      loop: subscriptionRequest.loop,
     });
 
     commit('incrementLastId')
@@ -101,6 +102,12 @@ export const actions = {
         id,
         completedState: 'success'
       });
+
+      if(newSubscription.loop)
+      {
+        dispatch('addSubscription', subscriptionRequest);
+      }
+
     } catch (err) {
       if (!err.message) {
         // Axios doesn't seem to tell us anything if an abort happens

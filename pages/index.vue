@@ -75,6 +75,13 @@
         :disabled="!timeout">
         </v-text-field>
       </v-col>
+      <v-col cols="12" md="3">
+        <v-switch
+          v-model="loop"
+          class="ma-2"
+          label="Loop"
+        ></v-switch>
+      </v-col>
     </v-row>
     <v-row>
       <v-toolbar dark>
@@ -103,6 +110,7 @@ export default {
       notification: true,
       timeoutMs: 60000,
       timeout: true,
+      loop: false,
     }
   },
   computed:{
@@ -136,7 +144,8 @@ export default {
         path: this.patchLink,
         notification: this.notification,
         pubsub: this.pubsub,
-        timeout: this.timeout ? this.timeoutMs : 0 // axios default is 0
+        timeout: this.timeout ? this.timeoutMs : 0, // axios default is 0
+        loop: this.loop // axios default is 0
       })
     },
     sync(){
